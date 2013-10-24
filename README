@@ -1,0 +1,13 @@
+Ghost Commander 1.51b2-supath
+
+This is a unofficial mod of Ghost Commander 1.51b4.
+(http://sites.google.com/site/ghostcommander1/)
+This version adds an option to specify your custom su location.
+
+I created this fork because not all Android devices is capable of
+putting su in $PATH without unwanted side effects; Some apps will
+refuse to work, some other devices disable its important features
+once it detects the existance of su.
+
+The su location option is located at the advanced options; just
+above the busybox location setting.
