@@ -1,8 +1,12 @@
-Ghost Commander 1.51b2-supath
+Ghost Commander 1.51b2-supath2
 
 This is a unofficial mod of Ghost Commander 1.51b2; r393 of official svn.
 (http://sites.google.com/site/ghostcommander1/)
-This version adds an option to specify your custom su location.
+This version has the following changes:
+*An option to specify your custom su location is added.
+*chmod/chown feature now correctly uses user's specified busybox.
+ Previously it just looked under $PATH, which causes failure when
+ busybox doesn't exist in any directory under $PATH.
 
 I created this fork because not all Android devices is capable of
 putting su in $PATH without unwanted side effects; Some apps will
@@ -13,5 +17,5 @@ The su location option is located at the advanced options; just
 above the busybox location setting.
 
 The apk of this version:
-GhostCommander-1.51b2-supath.apk (721 KB)
-https://mega.co.nz/#!NJhDzRrK!QjeeygIRXxYKQap2PcF4OTaFcu1aHk9xZEJUfUgjiBE
+GhostCommander-1.51b2-supath2.apk (721 KB)
+https://mega.co.nz/#!oNg3RYoA!LD-HsGjs49C5LFtrSTDYZW-MNQlUQmCi4QLT8WxWfAI
