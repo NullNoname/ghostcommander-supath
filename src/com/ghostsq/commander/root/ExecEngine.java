@@ -8,13 +8,15 @@ import java.util.regex.Matcher;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.ghostsq.commander.TextViewer;
 import com.ghostsq.commander.adapters.Engine;;
 
 public class ExecEngine extends Engine {
-    protected String sh;
+    protected String sh = "su";
     protected Context context;
     private   String bb = "";
     private   String  where, command;
@@ -26,27 +28,20 @@ public class ExecEngine extends Engine {
     private   OutputStreamWriter os = null;
     private   BufferedReader is = null;
     private   BufferedReader es = null;
-
+    
     protected ExecEngine( Context context_ ) {
         context = context_;
         where = null;
         command = null;
         result = null;
-        sh = getSuPath();
     }
     public ExecEngine( Context context_, String where_, String command_, boolean use_bb, int timeout ) {
         context = context_;
         where = where_;
         command = command_;
-        use_busybox = use_bb;
+        use_busybox = use_bb; 
         wait_timeout = timeout;
         result = new StringBuilder( 1024 );
-        sh = getSuPath();
-    }
-
-    public final String getSuPath() {
-    	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPref.getString( "su_path", "su" );
     }
 
     @Override
@@ -62,10 +57,10 @@ public class ExecEngine extends Engine {
             notify();
         }
         if( thread_handler != null )
-            sendResult( result != null && result.length() > 0 ? result.toString() :
+            sendResult( result != null && result.length() > 0 ? result.toString() : 
                    ( errMsg != null ? "\nFailed to execute \"" + command + "\"" : null ) );
     }
-
+    
     protected boolean execute( String cmd, boolean use_bb ) {
         command = cmd;
         use_busybox = use_bb;
@@ -77,7 +72,7 @@ public class ExecEngine extends Engine {
         wait_timeout = timeout;
         return execute();
     }
-
+    
     protected boolean execute() {
         os = null;
         is = null;
@@ -90,9 +85,9 @@ public class ExecEngine extends Engine {
             }
             else
                 bb = "busybox ";
-
+            
             Process p = Runtime.getRuntime().exec( sh );
-
+            
             os = new OutputStreamWriter( p.getOutputStream() );
             is = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
             es = new BufferedReader( new InputStreamReader( p.getErrorStream() ) );
@@ -126,16 +121,16 @@ public class ExecEngine extends Engine {
         }
         return false;
     }
-
-    protected void outCmd( boolean use_bb, String cmd, OutputStreamWriter os )
-              throws IOException, InterruptedException {
+ 
+    protected void outCmd( boolean use_bb, String cmd, OutputStreamWriter os ) 
+              throws IOException, InterruptedException { 
         String to_exec = ( use_bb ? bb : "" ) + cmd + "\n";
         Log.v( TAG, "executing: " + to_exec );
         os.write( to_exec ); // execute the command
         os.flush();
         boolean ready = false;
         final int swait = 10;
-        final int tries = wait_timeout / swait;
+        final int tries = wait_timeout / swait; 
         for( int i = 0; i < tries; i++ ) {
             if( is.ready() ) {
                 ready = true;
@@ -146,11 +141,11 @@ public class ExecEngine extends Engine {
         if( ready )
             Log.d( TAG, "After cmd execution the input stream is ready" );
         else
-            Log.w( TAG, "After " + wait_timeout + "ms the input stream is NOT yet ready!" );
-     }
+            Log.w( TAG, "After " + wait_timeout + "ms the input stream is NOT yet ready!" );            
+     }    
 
     // to override by a derived class which wants something more complex
-    protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) {
+    protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) { 
         try {
             if( command != null )
                 outCmd( use_busybox, command, os );
@@ -161,19 +156,19 @@ public class ExecEngine extends Engine {
             return !err;
         } catch( Exception e ) {
             error( e.getMessage() );
-            if( command != null )
+            if( command != null ) 
                 Log.e( TAG, "Exception '" + e.getMessage() + "' nn execution '" + command + "'" );
         }
         return false;
-    }
-
+    }    
+    
     // to override by derived classes
-    protected void procInput( BufferedReader br )
-              throws IOException, Exception {
+    protected void procInput( BufferedReader br ) 
+              throws IOException, Exception { 
         if( br != null && result != null )
             while( br.ready() ) {
                 Thread.sleep( 10 );
-                if( isStopReq() )
+                if( isStopReq() ) 
                     throw new Exception();
                 String ln = br.readLine();
                 if( ln == null ) break;
@@ -195,14 +190,14 @@ public class ExecEngine extends Engine {
         }
         return false;
     }
-
+    
     public synchronized StringBuilder getResult() {
         try {
             wait( 500 );
         } catch( InterruptedException e ) {}
         return done ? result : null;
     }
-
+    
     static String prepFileName( String fn ) {
         return "'" + fn.replaceAll( "'", Matcher.quoteReplacement("'\\''") ) + "'";
     }

@@ -243,11 +243,6 @@
                   android:title="@string/root_root"
                   android:summary="@string/summary_root_root"
                   android:defaultValue="false"/>
-		    <EditTextPreference 
-		        android:key="su_path" 
-		        android:title="@string/su_location" 
-		        android:summary="@string/summary_su_location" 
-		        android:defaultValue="su"/>
             <EditTextPreference 
 		        android:key="editor_activity" 
 		        android:title="@string/editor_activity" 

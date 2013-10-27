@@ -38,6 +38,7 @@
 <string name="ftp">FTP site</string>
 <string name="sftp">SFTP site</string>
 <string name="smb">Windows share</string>
+<string name="box">Box cloud storage</string>
 <string name="root">Root mode</string>
 <string name="mount">Mount points</string>
 <string name="mount_b">Mounts</string>
@@ -48,6 +49,7 @@
 <string name="ftp_descr">Connect to an FTP server, browse and transfer files both to and from it.</string>
 <string name="sftp_descr">Connect to a Secured (SSH) FTP server. SFTP plugin is requiered.</string>
 <string name="smb_descr">Connect to shared folders on a Windows machine. SMB plugin is requiered.</string>
+<string name="box_descr">Connect to the Box cloud storage. Box plugin is requiered.</string>
 <string name="root_descr">Use caution - for rooted devices only: Browse and interact with critical system files. Only proceed if you know what you\'re doing.</string>
 <string name="mount_descr">Display a list of all mount points. Remount them to \"rw\" mode, then back to \"ro\" mode after any changes are complete. Proceed with caution.</string>
 <string name="apps_descr">View and manage installed packages.</string>
@@ -153,11 +155,12 @@
 <string name="login_title">Login</string>
 <string name="delete_title">Delete</string>
 <string name="delete_err">Nothing to delete</string>
-<string name="delete_q">Delete %1$s ?</string>
+<string name="delete_q">Delete \"%1$s\"?</string>
 <string name="rescan_q">Are you sure you want to do the search again?</string>
 <string name="search_done">Search complete</string>
 <string name="done">Done</string>
 <string name="interrupted">Interrupted</string>
+<string name="cant_copy_to_itself">Can not copy the directory \"%s\" to itself or below.</string>
 <string name="too_deep_hierarchy">The file hierarchy is too deep.</string>
 <string name="nothing_found">No files found</string>
 <string name="preparing">Preparing…</string>
@@ -338,8 +341,6 @@
 <string name="summary_editor_activity">Enter the activity name of an external text editor</string>
 <string name="busybox_location">Path to BusyBox</string>
 <string name="summary_busybox_location">Specify the location of the BusyBox executable</string>
-<string name="su_location">Path to su</string>
-<string name="summary_su_location">Specify the location of the su executable</string>
 <string name="execute_command">Execute a command</string>
 <string name="nothing_to_open">Nothing to open.</string>
 <string name="remind_to_save">Don\'t forget to save your changes.</string>
