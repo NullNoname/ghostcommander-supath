@@ -339,6 +339,8 @@
 <string name="restart_to_apply_lang">Please restart the application to apply the new language</string>
 <string name="editor_activity">Custom text editor</string>
 <string name="summary_editor_activity">Enter the activity name of an external text editor</string>
+<string name="su_location">Path to su</string>
+<string name="summary_su_location">Specify the location of the su executable</string>
 <string name="busybox_location">Path to BusyBox</string>
 <string name="summary_busybox_location">Specify the location of the BusyBox executable</string>
 <string name="execute_command">Execute a command</string>

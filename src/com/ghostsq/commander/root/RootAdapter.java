@@ -32,12 +32,9 @@ import android.util.SparseBooleanArray;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListView;
-
 import com.ghostsq.commander.Commander;
 import com.ghostsq.commander.R;
 import com.ghostsq.commander.TextViewer;
@@ -77,19 +74,19 @@ public class RootAdapter extends CommanderAdapterBase {
             return super.setMode( mask, val );
         return mode;
     }
-   
+
     @Override
     public int getType() {
         return CA.ROOT;
     }
-    
+
     class ListEngine extends ExecEngine {
         private LsItem[] items_tmp;
         private String pass_back_on_done;
         private Uri src;
         private ArrayList<LsItem>  array;
         private final static String EOL = "_EOL_";
-        
+
         ListEngine( Context ctx, Handler h, Uri src_, String pass_back_on_done_ ) {
         	super( ctx );
         	setHandler( h );
@@ -98,7 +95,7 @@ public class RootAdapter extends CommanderAdapterBase {
         }
         public LsItem[] getItems() {
             return items_tmp;
-        }       
+        }
         public Uri getUri() {
             return src;
         }
@@ -125,20 +122,20 @@ public class RootAdapter extends CommanderAdapterBase {
             array = new ArrayList<LsItem>();
             // the option -s is not supported on some releases (1.6)
             String to_execute = "ls " + ( ( mode & MODE_HIDDEN ) != HIDE_MODE ? "-a ":"" ) + "-l " + ExecEngine.prepFileName( path ) + " ; echo " + EOL;
-            
-            if( !execute( to_execute, false, su ? 5000 : 500 ) ) // 'busybox -l' always outs UID/GID as numbers, not names!  
-                return false;   
+
+            if( !execute( to_execute, false, su ? 5000 : 500 ) ) // 'busybox -l' always outs UID/GID as numbers, not names!
+                return false;
 
             if( !isStopReq() ) {
                 int sz = array != null ? array.size() : 0;
                 items_tmp = new LsItem[sz];
                 if( sz > 0 ) {
                     array.toArray( items_tmp );
-                    LsItem.LsItemPropComparator comp = 
+                    LsItem.LsItemPropComparator comp =
                         items_tmp[0].new LsItemPropComparator( mode & MODE_SORTING, (mode & MODE_CASE) != 0, ascending );
                     Arrays.sort( items_tmp, comp );
                 }
-                                
+
                 return true;
             }
             return false;
@@ -146,7 +143,7 @@ public class RootAdapter extends CommanderAdapterBase {
         @Override
         protected void procInput( BufferedReader br ) throws IOException, Exception {
             while( br.ready() ) {
-                if( isStopReq() ) break; 
+                if( isStopReq() ) break;
                 String ln = br.readLine();
                 if( ln == null || ln.startsWith( EOL ) ) break;
                 LsItem item = new LsItem( ln );
@@ -167,7 +164,7 @@ public class RootAdapter extends CommanderAdapterBase {
                 uri = list_engine.getUri();
                 numItems = items != null ? items.length + 1 : 1;
                 notifyDataSetChanged();
-                
+
                 String path = uri.getPath();
                 if( path != null && path.startsWith( SYSTEM_PATH ) ) {
                     // know the /system mount state
@@ -198,7 +195,7 @@ public class RootAdapter extends CommanderAdapterBase {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public String toString() {
         if( uri != null ) {
@@ -207,7 +204,7 @@ public class RootAdapter extends CommanderAdapterBase {
                 try {
                     return uri.buildUpon().fragment( path != null && path.startsWith( SYSTEM_PATH ) ? systemMountMode : null ).build().toString();
                 } catch( Exception e ) {}
-            }            
+            }
             return uri.buildUpon().fragment( " " ).build().toString();
         }
         return "";
@@ -223,12 +220,12 @@ public class RootAdapter extends CommanderAdapterBase {
     public void setUri( Uri uri_ ) {
         uri = uri_;
     }
-    
+
     @Override
     public void setIdentities( String name, String pass ) {
         // TODO: provide a password for su ?
     }
-    
+
     @Override
     public boolean readSource( Uri tmp_uri, String pass_back_on_done ) {
         try {
@@ -237,7 +234,7 @@ public class RootAdapter extends CommanderAdapterBase {
             if( tmp_uri == null )
                 return false;
             uri = tmp_uri;  // since the Superuser application can break the execution,
-                            // it's important to keep the uri 
+                            // it's important to keep the uri
             if( reader != null ) {
                 if( attempts++ < 2 ) {
                     commander.showInfo( "Busy..." );
@@ -251,7 +248,7 @@ public class RootAdapter extends CommanderAdapterBase {
                     }
                 }
             }
-            
+
             notify( Commander.OPERATION_STARTED );
             reader = new ListEngine( commander.getContext(), readerHandler, tmp_uri, pass_back_on_done );
             reader.start();
@@ -311,7 +308,7 @@ public class RootAdapter extends CommanderAdapterBase {
             	    to = null;
             	} else {
                     to_path = createTempDir();
-                    recipient = to.getReceiver(); 
+                    recipient = to.getReceiver();
             	}
                 if( to_path != null ) {
                     notify( Commander.OPERATION_STARTED );
@@ -326,7 +323,7 @@ public class RootAdapter extends CommanderAdapterBase {
         }
         return false;
     }
-    
+
     class CopyFromEngine extends ExecEngine {
         private int counter = 0;
 	    private LsItem[] list;
@@ -380,9 +377,9 @@ public class RootAdapter extends CommanderAdapterBase {
             }
             sendResult( counter > 0 ? Utils.getOpReport( commander.getContext(), counter, move ? R.string.moved : R.string.copied ) : "" );
         }
-       
+
         @Override
-        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es )  { 
+        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es )  {
             try {
                 int num = list.length;
                 double conv = 100./(double)num;
@@ -393,13 +390,13 @@ public class RootAdapter extends CommanderAdapterBase {
                     String file_name = f.getName();
                     String full_name = src_base_path + file_name;
                     String cmd = move ? " mv -f" : ( f.isDirectory() ? " cp -a" : " cp" );
-                    String to_exec = cmd + " " + ExecEngine.prepFileName( full_name ) 
+                    String to_exec = cmd + " " + ExecEngine.prepFileName( full_name )
                                          + " " + esc_dest;
                     outCmd( true, to_exec, os );
                     if( procError( es ) ) return false;
                     try {
                         File    dst_file = new File( dest_folder, f.getName() );
-                        String  dst_path = ExecEngine.prepFileName( dst_file.getAbsolutePath() ); 
+                        String  dst_path = ExecEngine.prepFileName( dst_file.getAbsolutePath() );
                         Permissions perm = uid != null ? new Permissions( uid, uid, "-rw-rw----" ) :
                                                          new Permissions( f.getAttr() );
                         String chown_cmd = "chown " + perm.generateChownString().append(" ").append( dst_path ).toString();
@@ -420,7 +417,7 @@ public class RootAdapter extends CommanderAdapterBase {
             return false;
 	    }
 	}
-	    
+
 	@Override
 	public boolean createFile( String fileURI ) {
 		notify( "Operation is not supported.", Commander.OPERATION_FAILED );
@@ -432,7 +429,7 @@ public class RootAdapter extends CommanderAdapterBase {
         MkDirEngine mde = new MkDirEngine( commander.getContext(), simpleHandler, new_name );
         mde.start();
     }
-    
+
     class MkDirEngine extends ExecEngine {
         String new_name, full_name;
         MkDirEngine( Context ctx, Handler h, String new_name_ ) {
@@ -441,7 +438,7 @@ public class RootAdapter extends CommanderAdapterBase {
             new_name = new_name_;
             full_name = uri.getPath() + SLS + new_name;
         }
-        
+
         @Override
         public void run() {
             try {
@@ -477,7 +474,7 @@ public class RootAdapter extends CommanderAdapterBase {
         private String   src_base_path;
         private LsItem[] mList;
         private int counter = 0;
-        
+
         DelEngine( Context ctx, LsItem[] list ) {
         	super( ctx );
             mList = list;
@@ -495,9 +492,9 @@ public class RootAdapter extends CommanderAdapterBase {
                 counter = 0;
             sendResult( counter > 0 ? Utils.getOpReport( commander.getContext(), counter, R.string.deleted ) : "" );
         }
-       
+
         @Override
-        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) { 
+        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) {
             try {
                 int num = mList.length;
                 double conv = 100./num;
@@ -554,10 +551,10 @@ public class RootAdapter extends CommanderAdapterBase {
         if( items == null || position < 0 || position > items.length )
             return;
         LsItem item = items[position - 1];
-        
+
         if( item.isDirectory() ) {
         	String cur = uri.getPath();
-            if( cur == null || cur.length() == 0 ) 
+            if( cur == null || cur.length() == 0 )
                 cur = SLS;
             else
             	if( cur.charAt( cur.length()-1 ) != SLC )
@@ -576,7 +573,7 @@ public class RootAdapter extends CommanderAdapterBase {
             	return false;
             }
             notify( Commander.OPERATION_STARTED );
-            commander.startEngine( new CopyToEngine( commander.getContext(), full_names, 
+            commander.startEngine( new CopyToEngine( commander.getContext(), full_names,
                                      ( move_mode & MODE_MOVE ) != 0, uri.getPath(), false ) );
             return true;
 		} catch( Exception e ) {
@@ -584,7 +581,7 @@ public class RootAdapter extends CommanderAdapterBase {
 		}
 		return false;
     }
-    
+
     class CopyToEngine extends ExecEngine {
         private String[] src_full_names;
         private String   dest;
@@ -592,7 +589,7 @@ public class RootAdapter extends CommanderAdapterBase {
         private boolean quiet;
         private boolean permByDest = false;
         private int counter = 0;
-        
+
         CopyToEngine( Context ctx, String[] list, boolean move_, String dest_, boolean quiet_ ) {
         	super( ctx );
         	src_full_names = list;
@@ -604,7 +601,7 @@ public class RootAdapter extends CommanderAdapterBase {
         public final void setPermByDest() {
             permByDest = true;
         }
-        
+
         @Override
         public void run() {
             if( !execute() )
@@ -620,9 +617,9 @@ public class RootAdapter extends CommanderAdapterBase {
             else
                 sendResult( counter > 0 ? Utils.getOpReport( commander.getContext(), counter, move ? R.string.moved : R.string.copied ) : "" );
         }
-       
+
         @Override
-        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) { 
+        protected boolean cmdDialog( OutputStreamWriter os, BufferedReader is, BufferedReader es ) {
             try {
                 String cmd = move ? " mv" : " cp -a";
                 String esc_dest = prepFileName( dest );
@@ -633,22 +630,22 @@ public class RootAdapter extends CommanderAdapterBase {
                     if( full_name == null ) continue;
                     File src_file = new File( full_name );
                     File dst_file = new File( dest, src_file.getName() );
-                    String esc_dst_fn = prepFileName( dst_file.getAbsolutePath() ); 
+                    String esc_dst_fn = prepFileName( dst_file.getAbsolutePath() );
                     String esc_src_fn = prepFileName( full_name );
                     LsItem probe_item = null;
                     if( permByDest || !move ) {
                         String probe_fn = permByDest ? esc_dst_fn : esc_src_fn;
                         String ls_cmd = "ls -l " + probe_fn;
                         outCmd( false, ls_cmd, os );
-                        String str = null; 
+                        String str = null;
                         while( is.ready() ) {
                             str = is.readLine();
                             if( str != null && str.trim().length() > 0 )
-                                Log.v( TAG, ">>>" + str ); 
+                                Log.v( TAG, ">>>" + str );
                         }
                         if( str != null )
-                            probe_item = new LsItem( str ); 
-                    }                    
+                            probe_item = new LsItem( str );
+                    }
                     String to_exec = cmd + " " + esc_src_fn + " " + esc_dest;
                     outCmd( true, to_exec, os );
                     if( procError( es ) ) return false;
@@ -669,7 +666,7 @@ public class RootAdapter extends CommanderAdapterBase {
             return false;
         }
     }
-    
+
     @Override
     public boolean renameItem( int position, String newName, boolean copy ) {
         if( position <= 0 || position > items.length )
@@ -684,7 +681,7 @@ public class RootAdapter extends CommanderAdapterBase {
                 // TODO
                 return false;
             }
-            
+
             commander.startEngine( new CopyToEngine( commander.getContext(), a, true, to, true ) );
             return true;
         } catch( Exception e ) {
@@ -712,9 +709,9 @@ public class RootAdapter extends CommanderAdapterBase {
                     item.dir = curItem.isDirectory();
                     item.name = item.dir ? SLS + curItem.getName() : curItem.getName();
                     String lnk = curItem.getLinkTarget();
-                    if( lnk != null ) 
-                        item.name += " -> " + lnk; 
-                    
+                    if( lnk != null )
+                        item.name += " -> " + lnk;
+
                     item.size = curItem.isDirectory() ? -1 : curItem.length();
                     item.date = curItem.getDate();
                     item.attr = curItem.getAttr();
@@ -729,8 +726,8 @@ public class RootAdapter extends CommanderAdapterBase {
                         }
                         catch( Exception e ) {
                         }
-                    }                    
-                    
+                    }
+
                 }
             }
         }
@@ -741,7 +738,7 @@ public class RootAdapter extends CommanderAdapterBase {
     protected int getPredictedAttributesLength() {
         return 28;   // "---------- system   system"
     }
-    
+
     private final LsItem[] bitsToItems( SparseBooleanArray cis ) {
     	try {
             int counter = 0;
@@ -762,18 +759,18 @@ public class RootAdapter extends CommanderAdapterBase {
 		}
 		return null;
     }
-    
+
     @Override
     public void populateContextMenu( ContextMenu menu, AdapterView.AdapterContextMenuInfo acmi, int num ) {
         try {
             if( acmi.position > 0 )
                 menu.add( 0, CHMOD_CMD, 0, R.string.perms_label );
-            menu.add( 0, CMD_CMD, 0, commander.getContext().getString( R.string.execute_command ) ); 
+            menu.add( 0, CMD_CMD, 0, commander.getContext().getString( R.string.execute_command ) );
             super.populateContextMenu( menu, acmi, num );
         } catch( Exception e ) {
             Log.e( TAG, null, e );
         }
-    }    
+    }
 
     @Override
     public void doIt( int command_id, SparseBooleanArray cis ) {
@@ -805,16 +802,21 @@ public class RootAdapter extends CommanderAdapterBase {
             Log.e( TAG, "Can't do the command " + command_id, e );
         }
     }
-    
+
     public void execute( String command, boolean bb ) {
         commander.startEngine( new ExecEngine( commander.getContext(), uri.getPath(), command, bb, 500 ) );
     }
 
+    public final String getSuPath() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences( ctx );
+        return sharedPref.getString( "su_path", "su" );
+    }
+
     public final String getBusyBoxPath() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences( ctx );
-        return sharedPref.getString( "busybox_path", "busybox" ) + " ";            
+        return sharedPref.getString( "busybox_path", "busybox" ) + " ";
     }
-    
+
     public void executeToViewer( String command, boolean bb ) {
         ExecEngine ee = new ExecEngine( ctx, uri.getPath(), command, bb, 500 );
         ee.setHandler( new Handler() {
@@ -823,7 +825,7 @@ public class RootAdapter extends CommanderAdapterBase {
                     try {
                         String str = ((Bundle)msg.obj).getString( Commander.MESSAGE_STRING );
                         if( !Utils.str( str ) ) {
-                            msg.obj = ctx.getString( R.string.nothing ); 
+                            msg.obj = ctx.getString( R.string.nothing );
                             commander.notifyMe( msg );
                         }
                         else {
@@ -838,8 +840,8 @@ public class RootAdapter extends CommanderAdapterBase {
                 }
             } );
         ee.start();
-    }    
-    
+    }
+
     class CmdDialog implements OnClickListener {
         private LsItem   item;
         private RootAdapter owner;
@@ -881,16 +883,16 @@ public class RootAdapter extends CommanderAdapterBase {
         LsItemPropComparator comp = items[0].new LsItemPropComparator( mode & MODE_SORTING, (mode & MODE_CASE) != 0, ascending );
         Arrays.sort( items, comp );
     }
-    
+
     /* --- ContentEngine --- */
-    
+
     class ContentEngine extends Thread {
         private String file_path;
         private InputStream  is = null;
         private OutputStream os = null;
         private boolean open_done = false;
         private boolean may_close = false;
-        
+
         ContentEngine( String file_path_ ) {
             file_path = file_path_;
         }
@@ -901,12 +903,12 @@ public class RootAdapter extends CommanderAdapterBase {
             OutputStreamWriter osw = null;
             BufferedReader     ebr = null;
             try {
-                Process process = Runtime.getRuntime().exec( "su" );
+                Process process = Runtime.getRuntime().exec( getSuPath() );
                 os = process.getOutputStream();
                 ebr = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
                 osw = new OutputStreamWriter( os );
                 is = process.getInputStream();
-                
+
                 osw.write( "cat " + ExecEngine.prepFileName( file_path ) + "\n" );
                 osw.flush();
                 for( int i = 0; i < 5; i++ ) {
@@ -914,7 +916,7 @@ public class RootAdapter extends CommanderAdapterBase {
                     if( is.available() > 0 ) break;
                     //Log.v( TAG, "Waiting the stream starts " + i );
                 }
-                boolean empty = is.available() <= 0; 
+                boolean empty = is.available() <= 0;
                 synchronized( this ) {
                     open_done = true;
                 }
@@ -971,13 +973,13 @@ public class RootAdapter extends CommanderAdapterBase {
                 }
             }
         }
-        
+
         public synchronized boolean waitUntilOpen() {
             try {
                 for( int i = 0; i < 50; i++ ) {
                     if( open_done )
                         return true;
-                    wait( 100 ); 
+                    wait( 100 );
                 }
             } catch( InterruptedException e ) {}
             return false;
@@ -988,14 +990,14 @@ public class RootAdapter extends CommanderAdapterBase {
         public OutputStream getOutput() {
             return waitUntilOpen() ? os : null;
         }
-        
+
         public synchronized void close() {
             may_close = true;
             notify();
         }
-        
+
     }
-    
+
     @Override
     public Item getItem( Uri u ) {
         try {
@@ -1016,7 +1018,7 @@ public class RootAdapter extends CommanderAdapterBase {
         }
         return null;
     }
-    
+
     @Override
     public InputStream getContent( Uri u ) {
         try {
@@ -1025,7 +1027,7 @@ public class RootAdapter extends CommanderAdapterBase {
             contentEngine = new ContentEngine( path );
             contentEngine.start();
             InputStream is = contentEngine.getInput();
-            if( is == null ) 
+            if( is == null )
                 contentEngine.close();
             return is;
         } catch( Throwable e ) {
@@ -1033,13 +1035,13 @@ public class RootAdapter extends CommanderAdapterBase {
         }
         return null;
     }
-    
+
     @Override
     public OutputStream saveContent( Uri u ) {
         try {
             if( u == null ) return null;
             String path = u.getPath();
-            
+
             dst_f = new File( path );
             File root_f = ctx.getDir( "root", Context.MODE_PRIVATE );
             if( root_f == null )
@@ -1051,13 +1053,13 @@ public class RootAdapter extends CommanderAdapterBase {
         }
         return null;
     }
-    
-    
+
+
     @Override
     public void closeStream( Closeable s ) {
         if( s instanceof FileOutputStream ) {
             if( tmp_f == null || dst_f == null ) return;
-            
+
             CopyToEngine cte = new CopyToEngine( ctx, new String[] { tmp_f.getAbsolutePath() },
                     true, dst_f.getParent(), true );
             cte.setPermByDest();
